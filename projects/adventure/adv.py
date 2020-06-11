@@ -10,11 +10,11 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-map_file = "maps/test_line.txt"
+#map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-#map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -24,25 +24,31 @@ world.load_graph(room_graph)
 world.print_rooms()
 
 player = Player(world.starting_room)
-
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
 visited = set()
-s = Stack()
-while len(visited)<len(room_graph)-1:
+paths = Stack()
+while len(visited)<len(room_graph):
     exits = player.current_room.get_exits()
     path =[]
     for i in exits:
-        if i is not None and player.travel(i) not in visited:
+        if i is not None and player.current_room.get_room_in_direction(i) not in visited:
             path.append(i)
-    visited.add(player.current_room.id)
+    visited.add(player.current_room)
 
     if len(path)>0:
         direction = random.choice(path)
-        s.push(direction)
+        paths.push(direction)
         traversal_path.append(direction)
-
+        player.travel(direction)
+        
+    else:
+        back = {'s': 'n', 'n': 's', 'w': 'e', 'e': 'w'}
+        e= paths.pop()
+        traversal_path.append(back[e])
+        player.travel(back[e])
+  
 
 
 # TRAVERSAL TEST
@@ -64,6 +70,7 @@ else:
 #######
 # UNCOMMENT TO WALK AROUND
 #######
+'''
 player.current_room.print_room_description(player)
 while True:
     cmds = input("-> ").lower().split(" ")
@@ -73,3 +80,4 @@ while True:
         break
     else:
         print("I did not understand that command.")
+'''
